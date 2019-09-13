@@ -1,5 +1,6 @@
 # models.py
 import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -47,7 +48,7 @@ class Product(db.Model):
 
 
 class RMACase(db.Model):
-    __tablename__ = 'rma_products'
+    __tablename__ = 'rma_cases'
 
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(60))
