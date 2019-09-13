@@ -1,11 +1,14 @@
-from datetime import datetime
-import uuid
+import datetime
 import os
-import jwt
+import uuid
 from functools import wraps
+
+import jwt
 from flask import Flask, request, jsonify, make_response
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from .lib.models import *
+
+from lib.models import *
 
 app = Flask(__name__)
 
@@ -14,6 +17,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SUKKIRI_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+migrate = Migrate(app, db)
 
 
 def token_required(f):
@@ -79,7 +84,9 @@ def create_new_rma_case(current_user):
         data['distribution_company'] = 'N/A'
 
     new_rma_case = RMACase(brand=data['brand'], model=data['model'], problem=data['problem'],
-                           serial_number=data['serial_number'], distribution_company=data['distribution_company'])
+                           serial_number=data['serial_number'], distribution_company=data['distribution_company'],
+                           to_be_revised_date=datetime.datetime.now().strftime('%d-%m-%Y %H:%M'),
+                           to_be_revised_by=current_user.first_name + ' ' + current_user.last_name)
 
     try:
         db.session.add(new_rma_case)
@@ -145,23 +152,23 @@ def modify_rma_case_status(current_user, rma_case_id, new_status):
 
     if new_status == 'to_be_sent' and rma_case.status == 'to_be_revised':
         rma_case.status = new_status
-        rma_case.sent_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        rma_case.sent_date = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
         rma_case.sent_by = current_user.first_name + ' ' + current_user.last_name
     elif new_status == 'sent' and rma_case.status == 'to_be_sent':
         rma_case.status = new_status
-        rma_case.returned_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        rma_case.returned_date = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
         rma_case.returned_by = current_user.first_name + ' ' + current_user.last_name
     elif new_status == 'returned' and rma_case.status == 'sent':
         rma_case.status = new_status
-        rma_case.returned_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        rma_case.returned_date = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
         rma_case.returned_by = current_user.first_name + ' ' + current_user.last_name
     elif new_status == 'resolved':
         rma_case.status = new_status
-        rma_case.returned_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        rma_case.returned_date = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
         rma_case.returned_by = current_user.first_name + ' ' + current_user.last_name
     elif new_status == 'unresolved':
         rma_case.status = new_status
-        rma_case.returned_date = datetime.now().strftime('%Y-%m-%d %H:%M')
+        rma_case.returned_date = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
         rma_case.returned_by = current_user.first_name + ' ' + current_user.last_name
 
     db.session.commit()

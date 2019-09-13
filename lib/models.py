@@ -1,6 +1,4 @@
 # models.py
-import datetime
-
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -57,7 +55,7 @@ class RMACase(db.Model):
     serial_number = db.Column(db.String(120))
     distribution_company = db.Column(db.String(60), index=True)
     status = db.Column(db.String(60), default="to_be_revised")
-    to_be_revised_date = db.Column(db.DateTime, default=datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+    to_be_revised_date = db.Column(db.String(60))
     to_be_revised_by = db.Column(db.String(60))
     to_be_sent_date = db.Column(db.String(18))
     to_be_sent_by = db.Column(db.String(60))
