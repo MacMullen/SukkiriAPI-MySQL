@@ -4,7 +4,7 @@ import mysql.connector
 from werkzeug.security import generate_password_hash
 
 mydb = mysql.connector.connect(
-    host="localhost",
+    host=sys.argv[6],
     user=sys.argv[2],
     passwd=str(sys.argv[3]),
     database=sys.argv[1]
