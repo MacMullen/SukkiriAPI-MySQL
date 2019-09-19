@@ -281,7 +281,8 @@ def get_all_products(current_user):
 def create_new_product(current_user):
     data = request.get_json()
 
-    new_product = Product(brand=data['brand'], model=data['model'], description=data['description'],
+    new_product = Product(brand=data['brand'].upper(), model=data['model'].upper(),
+                          description=data['description'].title(),
                           stock=int(data['stock']), stock_under_control=bool(data['stock_under_control']),
                           distribution_company=data['distribution_company'], ean=data['ean'])
 
@@ -291,6 +292,13 @@ def create_new_product(current_user):
         return jsonify({'message': 'New product created!'})
     except:
         return jsonify({'message': 'Product already exists!'})
+
+
+@app.route('/api/products/count', methods=['GET'])
+@token_required
+def count_products(current_user):
+    count = db.session.query(Product).count()
+    return jsonify({'count': count})
 
 
 @app.route('/api/products/<product_id>', methods=['GET'])

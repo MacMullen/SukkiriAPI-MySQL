@@ -1,0 +1,8 @@
+runtime: python37
+
+env_variables:
+  SUKKIRI_DATABASE_URI: 'your locale / glcoud sql URI'
+  SUKKIRI_SECRET_KEY: 'same secret key used in Sukkiri Dashboard'
+
+beta_settings:
+  cloud_sql_instances: 'cloud-sql instance name here'
