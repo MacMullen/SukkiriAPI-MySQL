@@ -6,6 +6,7 @@ from functools import wraps
 import jwt
 from flask import Flask, request, jsonify, make_response
 from flask_migrate import Migrate
+from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from lib.models import *
@@ -17,6 +18,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SUKKIRI_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
 
 migrate = Migrate(app, db)
 
@@ -34,7 +37,8 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = db.session.query(User).filter_by(public_id=data['public_id']).first()
+            current_user = db.session.query(User).filter_by(
+                public_id=data['public_id']).first()
         except:
             return jsonify({'message': 'Token is invalid!'}), 401
 
@@ -142,7 +146,7 @@ def modify_rma_case(current_user, rma_case_id):
     return jsonify({'message': 'RMA case modified successfully!'})
 
 
-@app.route('/api/rma_cases/<rma_case_id>/status/<new_status>', methods=['POST'])
+@app.route('/api/rma_cases/<rma_case_id>/status/<new_status>', methods=['PUT'])
 @token_required
 def modify_rma_case_status(current_user, rma_case_id, new_status):
     rma_case = db.session.query(RMACase).filter_by(id=rma_case_id).first()
@@ -212,7 +216,8 @@ def create_new_dist_company(current_user):
 @app.route('/api/dist_companies/<dist_company_id>', methods=['GET'])
 @token_required
 def get_dist_company(current_user, dist_company_id):
-    dist_company = db.session.query(DistributionCompany).filter_by(id=dist_company_id).first()
+    dist_company = db.session.query(
+        DistributionCompany).filter_by(id=dist_company_id).first()
 
     if not dist_company:
         return jsonify({'message': 'No distribution company found!'})
@@ -227,7 +232,8 @@ def get_dist_company(current_user, dist_company_id):
 @app.route('/api/dist_companies/<dist_company_id>', methods=['PUT'])
 @token_required
 def modify_dist_company(current_user, dist_company_id):
-    dist_company = db.session.query(DistributionCompany).filter_by(id=dist_company_id).first()
+    dist_company = db.session.query(
+        DistributionCompany).filter_by(id=dist_company_id).first()
 
     if not dist_company:
         return jsonify({'message': 'No product found!'})
@@ -249,7 +255,8 @@ def modify_dist_company(current_user, dist_company_id):
 @app.route('/api/dist_companies/<dist_company_id>', methods=['DELETE'])
 @token_required
 def delete_dist_company(current_user, dist_company_id):
-    dist_company = db.session.query(DistributionCompany).filter_by(id=dist_company_id).first()
+    dist_company = db.session.query(
+        DistributionCompany).filter_by(id=dist_company_id).first()
 
     if not dist_company:
         return jsonify({'message': 'No distribution company found!'})
@@ -452,7 +459,8 @@ def modify_user(current_user, user_public_id):
     if 'role' in data:
         user.role = data['role']
     if 'password' in data:
-        hashed_password = generate_password_hash(data['password'], method='sha256')
+        hashed_password = generate_password_hash(
+            data['password'], method='sha256')
         user.password = hashed_password
 
     db.session.commit()
@@ -491,7 +499,8 @@ def login():
 
     if check_password_hash(user.password_hash, auth.password):
         token = jwt.encode(
-            {'public_id': user.public_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)},
+            {'public_id': user.public_id, 'exp': datetime.datetime.utcnow() +
+             datetime.timedelta(hours=24)},
             app.config['SECRET_KEY'])
         return jsonify({'token': token.decode('UTF-8')})
 

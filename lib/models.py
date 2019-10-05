@@ -24,7 +24,7 @@ class DistributionCompany(db.Model):
     name = db.Column(db.String(60), unique=True)
     email = db.Column(db.String(60))
     address = db.Column(db.String(200))
-    hours = db.Column(db.String(13))
+    hours = db.Column(db.String(20))
     contact_name = db.Column(db.String(60))
     phone = db.Column(db.String(60))
 
