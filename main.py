@@ -4,12 +4,13 @@ import uuid
 from functools import wraps
 
 import jwt
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, send_file
 from flask_migrate import Migrate
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from lib.models import *
+from lib.invoice import generate_invoice
 
 app = Flask(__name__)
 
@@ -178,6 +179,15 @@ def modify_rma_case_status(current_user, rma_case_id, new_status):
     db.session.commit()
 
     return jsonify({'message': 'RMA case modified successfully!'})
+
+@app.route('/api/rma_cases/invoice/<dist_company>', methods=['GET'])
+@token_required
+def get_invoice(current_user, dist_company):
+    rma_cases = db.session.query(RMACase).filter_by(distribution_company=dist_company).filter_by(status="to_be_revised").all()
+
+    generate_invoice(rma_cases, dist_company)
+
+    return send_file('temp.pdf', attachment_filename="invoice.pdf")
 
 
 @app.route('/api/dist_companies', methods=['GET'])
