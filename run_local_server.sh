@@ -1,0 +1,4 @@
+export SUKKIRI_DATABASE_URI='mysql://macmullen:g29BiAoHES^5KrVVigY3B@35.247.226.34/sukkiri_db'
+export SUKKIRI_SECRET_KEY='MORDENT LACROSSE WAFTAGE QUELL FROGMAN DISCLOSE'
+export FLASK_APP='main.py'
+flask run

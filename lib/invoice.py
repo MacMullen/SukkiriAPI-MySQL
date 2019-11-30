@@ -24,7 +24,7 @@ def generate_invoice(rma_cases, dist_company):
 
     # PDF Text - Content
     line1 = '<font size=10><b>MY COMPANY NAME</b></font>'
-    line2 = '<b>Fecha: {}</b>'.format(datetime.datetime.now().strftime("%d-%m-%y"))
+    line2 = '<b>DATE: {}</b>'.format(datetime.datetime.now().strftime("%d-%m-%y"))
     line3 = 'RMA INVOICE - <b>{}</b>'.format(dist_company.upper())
 
     elements.append(Paragraph(line1, styleNormal))
@@ -60,8 +60,8 @@ def generate_invoice(rma_cases, dist_company):
         1.5 * cm,  # Column 0
         3 * cm,  # Column 1
         4 * cm,  # Column 2
-        11 * cm,  # Column 4
-        5 * cm,  # Column 5
+        12 * cm,  # Column 4
+        6 * cm,  # Column 5
     ]
 
     # PDF Table - Strip '[]() and add word wrap to column 5
@@ -88,7 +88,7 @@ def generate_invoice(rma_cases, dist_company):
     deliver_header_line = Paragraph("""<font size=12><b>DELIVERS</b></font>""", styles['Normal'])
     pick_header_line = Paragraph("""<font size=12><b>RECEIVES</b></font>""", styles['Normal'])
     signature_line = Paragraph("""<b>SIGNATURE:</b>""", styles['Normal'])
-    text_line = Paragraph("""<b>CLARIFICATION OF SIGNATURE:</b>""", styles['Normal'])
+    text_line = Paragraph("""<b>CLARIFICATION:</b>""", styles['Normal'])
     document_line = Paragraph("""<b>ID:</b>""", styles['Normal'])
     sign_table = [[pick_header_line, deliver_header_line], [signature_line, signature_line], [text_line, text_line],
                   [document_line, document_line]]
@@ -100,12 +100,16 @@ def generate_invoice(rma_cases, dist_company):
 
     lWidth, lHeight = A4
 
+    pdf_buffer = BytesIO()
+
     # Generate PDF
     archivo_pdf = SimpleDocTemplate(
-        'temp.pdf',
+        pdf_buffer,
         pagesize=(lHeight, lWidth),
         rightMargin=20,
         leftMargin=20,
         topMargin=40,
         bottomMargin=28)
     archivo_pdf.build(elements)
+    pdf_buffer.seek(0)
+    return pdf_buffer

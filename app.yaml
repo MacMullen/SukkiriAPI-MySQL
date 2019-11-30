@@ -1,8 +1,8 @@
 runtime: python37
 
 env_variables:
-  SUKKIRI_DATABASE_URI: 'your locale / glcoud sql URI'
-  SUKKIRI_SECRET_KEY: 'same secret key used in Sukkiri Dashboard'
+        SUKKIRI_DATABASE_URI: 'mysql://macmullen:g29BiAoHES^5KrVVigY3B@/sukkiri_db?unix_socket=/cloudsql/sukkiri-252820:southamerica-east1:api'
+        SUKKIRI_SECRET_KEY: 'MORDENT LACROSSE WAFTAGE QUELL FROGMAN DISCLOSE'
 
 beta_settings:
-  cloud_sql_instances: 'cloud-sql instance name here'
+    cloud_sql_instances: 'sukkiri-252820:southamerica-east1:api'

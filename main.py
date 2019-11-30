@@ -180,14 +180,16 @@ def modify_rma_case_status(current_user, rma_case_id, new_status):
 
     return jsonify({'message': 'RMA case modified successfully!'})
 
+
 @app.route('/api/rma_cases/invoice/<dist_company>', methods=['GET'])
 @token_required
 def get_invoice(current_user, dist_company):
-    rma_cases = db.session.query(RMACase).filter_by(distribution_company=dist_company).filter_by(status="to_be_revised").all()
+    rma_cases = db.session.query(RMACase).filter_by(distribution_company=dist_company).filter_by(
+        status="to_be_revised").all()
 
-    generate_invoice(rma_cases, dist_company)
+    pdf_file = generate_invoice(rma_cases, dist_company)
 
-    return send_file('temp.pdf', attachment_filename="invoice.pdf")
+    return send_file(pdf_file, mimetype='application/pdf', attachment_filename="invoice.pdf")
 
 
 @app.route('/api/dist_companies', methods=['GET'])
@@ -510,7 +512,7 @@ def login():
     if check_password_hash(user.password_hash, auth.password):
         token = jwt.encode(
             {'public_id': user.public_id, 'exp': datetime.datetime.utcnow() +
-             datetime.timedelta(hours=24)},
+                                                 datetime.timedelta(hours=24)},
             app.config['SECRET_KEY'])
         return jsonify({'token': token.decode('UTF-8')})
 
